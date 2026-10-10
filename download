@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.idea/
+.vscode/
+checkpoints/
+data/images/
+data/*.csv
+outputs/
+data/synthetic/
+*.pt
+*.pth
+*.ckpt
+

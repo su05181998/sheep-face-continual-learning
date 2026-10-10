@@ -1,0 +1,74 @@
+experiment:
+  name: smoke
+  output_dir: outputs/smoke
+  seeds: [0]
+  stages: [T1, T2, T3, T4]
+data:
+  manifest: data/synthetic/manifest.csv
+  root: data/synthetic/images
+  image_size: 64
+  num_classes: 4
+  workers: 0
+  pin_memory: false
+  strict_counts: false
+  expected_per_identity: {train: 2, validation: 1, test: 1}
+  mean: [0.485, 0.456, 0.406]
+  std: [0.229, 0.224, 0.225]
+model:
+  image_size: 64
+  num_classes: 4
+  embedding_dim: 32
+  channels: [8, 16, 24, 32]
+  depths: [0, 2, 2, 2]
+  key_dims: [4, 4, 4, 4]
+  num_heads: [1, 1, 1, 2]
+  small_context_kernel: 3
+  large_context_kernel: 5
+  ska_kernel: 3
+  ska_groups: 2
+  context_mode: adaptive
+  stage4_block: msa
+  imagenet_checkpoint: null
+  require_imagenet_checkpoint: false
+augmentation:
+  horizontal_flip_probability: 0.5
+  rotation_degrees: 10
+  brightness: 0.1
+  contrast: 0.1
+  saturation: 0.1
+  hue: 0.0
+initial_training:
+  optimizer: AdamW
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  batch_size: 4
+  epochs: 1
+  scheduler: CosineAnnealingLR
+  t_max: 1
+  minimum_learning_rate: 0.000001
+  warmup_epochs: 0
+  early_stopping: false
+continual_training:
+  optimizer: AdamW
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  batch_size: 4
+  epochs: 1
+  scheduler: CosineAnnealingLR
+  t_max: 1
+  minimum_learning_rate: 0.000001
+  warmup_epochs: 0
+  early_stopping: false
+pgrcl:
+  lambda_feature_distillation: 1.0
+  lambda_historical_prototype: 1.0
+  lambda_relation_preservation: 0.5
+  prototype_reference: historical
+ewc: {lambda: 100.0}
+lwf: {temperature: 2.0, lambda_kd: 1.0}
+replay:
+  total_capacity: 8
+  capacity_per_identity: 2
+  current_batch_size: 2
+  replay_batch_size: 2
+

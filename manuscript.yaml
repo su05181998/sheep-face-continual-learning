@@ -1,0 +1,86 @@
+experiment:
+  name: cgsfnet_pgrcl
+  output_dir: outputs/cgsfnet_pgrcl
+  seeds: [0, 1, 2, 3, 4]
+  stages: [T1, T2, T3, T4]
+
+data:
+  manifest: data/manifest.csv
+  root: data/images
+  image_size: 224
+  num_classes: 180
+  workers: 8
+  pin_memory: true
+  strict_counts: true
+  expected_per_identity: {train: 70, validation: 10, test: 20}
+  mean: [0.485, 0.456, 0.406]
+  std: [0.229, 0.224, 0.225]
+
+model:
+  image_size: 224
+  num_classes: 180
+  embedding_dim: 512
+  channels: [64, 128, 256, 384]
+  depths: [0, 2, 8, 10]
+  key_dims: [16, 16, 16, 16]
+  num_heads: [3, 3, 3, 4]
+  small_context_kernel: 7
+  large_context_kernel: 11
+  ska_kernel: 3
+  ska_groups: 8
+  context_mode: adaptive
+  stage4_block: msa
+  imagenet_checkpoint: checkpoints/lsnet_t_imagenet1k.pth
+  require_imagenet_checkpoint: true
+
+augmentation:
+  horizontal_flip_probability: 0.5
+  rotation_degrees: 30
+  brightness: 0.2
+  contrast: 0.2
+  saturation: 0.2
+  hue: 0.0
+
+initial_training:
+  optimizer: AdamW
+  learning_rate: 0.0005
+  weight_decay: 0.0001
+  batch_size: 32
+  epochs: 100
+  scheduler: CosineAnnealingLR
+  t_max: 100
+  minimum_learning_rate: 0.000001
+  warmup_epochs: 0
+  early_stopping: false
+
+continual_training:
+  optimizer: AdamW
+  learning_rate: 0.0001
+  weight_decay: 0.0001
+  batch_size: 32
+  epochs: 50
+  scheduler: CosineAnnealingLR
+  t_max: 50
+  minimum_learning_rate: 0.000001
+  warmup_epochs: 0
+  early_stopping: false
+
+pgrcl:
+  lambda_feature_distillation: 1.0
+  lambda_historical_prototype: 1.0
+  lambda_relation_preservation: 0.5
+  prototype_reference: historical
+
+ewc:
+  lambda: 100.0
+
+lwf:
+  temperature: 2.0
+  lambda_kd: 1.0
+
+replay:
+  total_capacity: 1800
+  capacity_per_identity: 10
+  current_batch_size: 16
+  replay_batch_size: 16
+
